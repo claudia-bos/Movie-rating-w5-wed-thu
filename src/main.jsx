@@ -10,14 +10,51 @@ import App from './App.jsx';
 import './css/index.css';
 import ErrorPage from './pages/ErrorPage.jsx';
 import IndexPage from './pages/IndexPage.jsx';
+import AllMoviesPage from './pages/AllMoviesPage.jsx'
+import MovieDetailsPage from './pages/MovieDetailPage.jsx'
+import axios from 'axios';
+import LoginPage from './pages/LoginPage.jsx';
+import YourRatingsPage from './pages/YourRatingsPage.jsx';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route path="/" element={<App />} errorElement={<ErrorPage />}>
-      <Route index element={<IndexPage />} />
-    </Route>,
-  ),
-);
+
+    <Route path='/' element={<App/>} errorElement={<ErrorPage/>}>
+
+      <Route index element={<IndexPage/>}/>
+      <Route 
+      path='/movies' 
+      element={<AllMoviesPage/>}
+      loader={async () => {
+        const movieList = await axios.get('/api/movies')
+        return {movies: movieList.data}
+      }}
+      />
+      <Route 
+      path='/movies/:movieId' 
+      element={<MovieDetailsPage/>} 
+      loader={async ({params}) => {
+        const res = await axios.get(`/api/movies/${params.movieId}`)
+
+        return {movie: res.data}
+      }}
+      />
+      <Route 
+      path='login' 
+      element={<LoginPage/>} 
+      />
+      <Route
+      path='me' 
+      element={<YourRatingsPage/>}
+      loader={async () => {
+        const res = await axios.get('/api/ratings');
+        return { ratings: res.data };
+      }}
+      />
+
+    </Route>
+
+))
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
